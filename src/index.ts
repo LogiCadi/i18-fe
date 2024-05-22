@@ -21,15 +21,37 @@ export default class I18<T> {
     this.replace = options.replace || false;
     this.defaultLocale = options.defaultLocale || "zh";
 
-    console.log(this);
-
     if (this.replace) this.DOMreplace();
   }
 
   DOMreplace() {
-    // text
-    const textDOM = document.querySelectorAll("[i18-text]");
-    console.log(textDOM);
+    const contentHandler = (content: string) => {
+      return (
+        this.t(content as keyof T) ||
+        content.replace(/{locale}/g, this.getLocale())
+      );
+    };
+    // 常规元素的children
+    const commonDOM = document.querySelectorAll("[i18-children]");
+    for (let i = 0; i < commonDOM.length; i++) {
+      const content = commonDOM[i].getAttribute("i18-children");
+      commonDOM[i].innerHTML = contentHandler(content as string);
+    }
+    // 输入框的placeholder
+    const inputDOM = document.querySelectorAll("[i18-placeholder]");
+    for (let i = 0; i < inputDOM.length; i++) {
+      const content = inputDOM[i].getAttribute("i18-placeholder");
+      inputDOM[i].setAttribute(
+        "placeholder",
+        contentHandler(content as string)
+      );
+    }
+    // 图片的src
+    const srcDOM = document.querySelectorAll("[i18-src]");
+    for (let i = 0; i < srcDOM.length; i++) {
+      const content = srcDOM[i].getAttribute("i18-src");
+      srcDOM[i].setAttribute("src", contentHandler(content as string));
+    }
   }
 
   setLocale(locale: string) {
@@ -43,7 +65,10 @@ export default class I18<T> {
 
     window.location.href = `${url}?${newParams}`;
     localStorage.setItem(this.localeField, locale);
-    window.location.reload();
+
+    if (window.location.href.indexOf("#") !== -1) {
+      window.location.reload();
+    }
   }
 
   getLocale() {
@@ -53,7 +78,7 @@ export default class I18<T> {
       localStorage.getItem(this.localeField) ||
       this.defaultLocale;
 
-    return locale;
+    return locale as string;
   }
 
   /** 翻译 */

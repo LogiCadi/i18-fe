@@ -585,14 +585,33 @@
             this.localeField = options.localeField || "locale";
             this.replace = options.replace || false;
             this.defaultLocale = options.defaultLocale || "zh";
-            console.log(this);
             if (this.replace)
                 this.DOMreplace();
         }
         I18.prototype.DOMreplace = function () {
-            // text
-            var textDOM = document.querySelectorAll("[i18-text]");
-            console.log(textDOM);
+            var _this = this;
+            var contentHandler = function (content) {
+                return (_this.t(content) ||
+                    content.replace(/{locale}/g, _this.getLocale()));
+            };
+            // 常规元素的children
+            var commonDOM = document.querySelectorAll("[i18-children]");
+            for (var i = 0; i < commonDOM.length; i++) {
+                var content = commonDOM[i].getAttribute("i18-children");
+                commonDOM[i].innerHTML = contentHandler(content);
+            }
+            // 输入框的placeholder
+            var inputDOM = document.querySelectorAll("[i18-placeholder]");
+            for (var i = 0; i < inputDOM.length; i++) {
+                var content = inputDOM[i].getAttribute("i18-placeholder");
+                inputDOM[i].setAttribute("placeholder", contentHandler(content));
+            }
+            // 图片的src
+            var srcDOM = document.querySelectorAll("[i18-src]");
+            for (var i = 0; i < srcDOM.length; i++) {
+                var content = srcDOM[i].getAttribute("i18-src");
+                srcDOM[i].setAttribute("src", contentHandler(content));
+            }
         };
         I18.prototype.setLocale = function (locale) {
             var _a;
@@ -601,7 +620,9 @@
             var newParams = queryString.stringify(__assign(__assign({}, queryString.parse(params)), (_a = {}, _a[this.localeField] = locale, _a)));
             window.location.href = "".concat(url, "?").concat(newParams);
             localStorage.setItem(this.localeField, locale);
-            window.location.reload();
+            if (window.location.href.indexOf("#") !== -1) {
+                window.location.reload();
+            }
         };
         I18.prototype.getLocale = function () {
             var _a;

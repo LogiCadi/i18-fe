@@ -1,4 +1,3 @@
-import { A } from "./test";
 export default class I18<T> {
     /** 语言包 */
     pack: T;
@@ -10,13 +9,13 @@ export default class I18<T> {
     defaultLocale: string;
     constructor(options: {
         pack: T;
-        localeField?: A;
+        localeField?: string;
         replace?: boolean;
         defaultLocale?: string;
     });
     DOMreplace(): void;
     setLocale(locale: string): void;
-    getLocale(): string | string[];
+    getLocale(): string;
     /** 翻译 */
     t(key: keyof T, params?: any): any;
 }
