@@ -11,12 +11,12 @@ export default class I18<T> {
   defaultLocale;
 
   constructor(options: {
-    pack: T;
+    pack?: T;
     localeField?: string;
     replace?: boolean;
     defaultLocale?: string;
   }) {
-    this.pack = options.pack;
+    this.pack = options.pack || {};
     this.localeField = options.localeField || "locale";
     this.replace = options.replace || false;
     this.defaultLocale = options.defaultLocale || "zh";
@@ -84,8 +84,9 @@ export default class I18<T> {
   /** 翻译 */
   t(key: keyof T, params?: any) {
     const locale = this.getLocale();
-    // @ts-ignore
-    let result = this.pack[key]?.[locale];
+    let result =
+      // @ts-ignore
+      this.pack[key]?.[locale] || this.pack[key]?.[this.defaultLocale];
 
     if (params) {
       Object.keys(params).forEach((paramsKey) => {

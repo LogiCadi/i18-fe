@@ -1,6 +1,6 @@
 export default class I18<T> {
     /** 语言包 */
-    pack: T;
+    pack: {};
     /** 语言字段 */
     localeField: string;
     /** 开启替换模式来替换原生DOM中的文字 */
@@ -8,7 +8,7 @@ export default class I18<T> {
     /** 默认语言 */
     defaultLocale: string;
     constructor(options: {
-        pack: T;
+        pack?: T;
         localeField?: string;
         replace?: boolean;
         defaultLocale?: string;
