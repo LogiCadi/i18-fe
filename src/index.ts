@@ -3,11 +3,11 @@ import { stringify, parse } from "query-string";
 export type I18Props<T> = {
   /** 语言包 */
   pack?: T;
-  /** 语言字段 */
+  /** 语言字段，默认：locale */
   localeField?: string;
-  /** 默认语言 */
+  /** 默认语言，默认：zh */
   defaultLocale?: string;
-  /** 开启替换模式来替换原生DOM中的文字 */
+  /** 开启替换模式来替换原生DOM中的文字，默认：false */
   replace?: boolean;
   debug?: boolean;
 };
@@ -21,6 +21,7 @@ export default class I18<T> {
     this.defaultLocale = props.defaultLocale || "zh";
     this.replace = props.replace || false;
     this.debug = props.debug || false;
+    this.locale = this.getLocale(true);
 
     if (this.replace) this.DOMreplace();
     if (this.debug) console.log("I18初始化", this);
@@ -58,32 +59,49 @@ export default class I18<T> {
 
   /** 设置语言 */
   setLocale(locale: string) {
+    // set storage locale
+    localStorage.setItem(this.localeField, locale);
+
+    // set url locale
     const url = window.location.href.split("?")[0];
     const params = window.location.href.split("?")[1];
-
     const newParams = stringify({
       ...parse(params),
       [this.localeField]: locale,
     });
-
     window.location.href = `${url}?${newParams}`;
-    localStorage.setItem(this.localeField, locale);
-
     if (window.location.href.indexOf("#") !== -1) {
       window.location.reload();
     }
   }
 
-  /** 获取语言 */
-  getLocale() {
+  initLocale() {
     const params = window.location.href.split("?")[1];
+    const urlLocale = parse(params)?.[this.localeField];
+    const storageLocale = localStorage.getItem(this.localeField);
 
-    const locale =
-      parse(params)?.[this.localeField] ||
-      localStorage.getItem(this.localeField) ||
-      this.defaultLocale;
+    if (urlLocale && typeof urlLocale === "string" && !storageLocale) {
+      localStorage.setItem(this.localeField, urlLocale);
+    }
 
-    return locale as string;
+    this.locale = urlLocale || storageLocale || this.defaultLocale;
+  }
+
+  /** 获取语言 */
+  getLocale(basis = false): string {
+    if (basis) {
+      const params = window.location.href.split("?")[1];
+      const urlLocale = parse(params)?.[this.localeField];
+      const storageLocale = localStorage.getItem(this.localeField);
+
+      if (urlLocale && typeof urlLocale === "string" && !storageLocale) {
+        localStorage.setItem(this.localeField, urlLocale);
+      }
+
+      return urlLocale || storageLocale || this.defaultLocale;
+    } else {
+      return this.locale;
+    }
   }
 
   /** 翻译 */
