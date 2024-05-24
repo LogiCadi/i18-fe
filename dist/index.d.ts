@@ -1,20 +1,21 @@
-export default class I18<T> {
+export type I18Props<T> = {
     /** 语言包 */
-    pack: {};
+    pack?: T;
     /** 语言字段 */
-    localeField: string;
-    /** 开启替换模式来替换原生DOM中的文字 */
-    replace: boolean;
+    localeField?: string;
     /** 默认语言 */
-    defaultLocale: string;
-    constructor(options: {
-        pack?: T;
-        localeField?: string;
-        replace?: boolean;
-        defaultLocale?: string;
-    });
+    defaultLocale?: string;
+    /** 开启替换模式来替换原生DOM中的文字 */
+    replace?: boolean;
+    debug?: boolean;
+};
+export default class I18<T> {
+    [x: string]: any;
+    constructor(props?: I18Props<T>);
     DOMreplace(): void;
+    /** 设置语言 */
     setLocale(locale: string): void;
+    /** 获取语言 */
     getLocale(): string;
     /** 翻译 */
     t(key: keyof T, params?: any): any;

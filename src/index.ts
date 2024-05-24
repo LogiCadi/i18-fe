@@ -1,27 +1,29 @@
 import { stringify, parse } from "query-string";
 
-export default class I18<T> {
+export type I18Props<T> = {
   /** 语言包 */
-  pack;
+  pack?: T;
   /** 语言字段 */
-  localeField;
-  /** 开启替换模式来替换原生DOM中的文字 */
-  replace;
+  localeField?: string;
   /** 默认语言 */
-  defaultLocale;
+  defaultLocale?: string;
+  /** 开启替换模式来替换原生DOM中的文字 */
+  replace?: boolean;
+  debug?: boolean;
+};
 
-  constructor(options: {
-    pack?: T;
-    localeField?: string;
-    replace?: boolean;
-    defaultLocale?: string;
-  }) {
-    this.pack = options.pack || {};
-    this.localeField = options.localeField || "locale";
-    this.replace = options.replace || false;
-    this.defaultLocale = options.defaultLocale || "zh";
+export default class I18<T> {
+  [x: string]: any;
+
+  constructor(props: I18Props<T> = {}) {
+    this.pack = props.pack || {};
+    this.localeField = props.localeField || "locale";
+    this.defaultLocale = props.defaultLocale || "zh";
+    this.replace = props.replace || false;
+    this.debug = props.debug || false;
 
     if (this.replace) this.DOMreplace();
+    if (this.debug) console.log("I18初始化", this);
   }
 
   DOMreplace() {
@@ -54,6 +56,7 @@ export default class I18<T> {
     }
   }
 
+  /** 设置语言 */
   setLocale(locale: string) {
     const url = window.location.href.split("?")[0];
     const params = window.location.href.split("?")[1];
@@ -71,8 +74,10 @@ export default class I18<T> {
     }
   }
 
+  /** 获取语言 */
   getLocale() {
     const params = window.location.href.split("?")[1];
+
     const locale =
       parse(params)?.[this.localeField] ||
       localStorage.getItem(this.localeField) ||

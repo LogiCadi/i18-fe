@@ -1,6 +1,7 @@
 {
   "name": "i18-fe",
-  "version": "1.1.0",
+  "version": "1.1.5",
+  "description": "i18n for frontend",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "license": "MIT",
