@@ -75,30 +75,20 @@ export default class I18<T> {
     }
   }
 
-  initLocale() {
-    const params = window.location.href.split("?")[1];
-    const urlLocale = parse(params)?.[this.localeField];
-    const storageLocale = localStorage.getItem(this.localeField);
-
-    if (urlLocale && typeof urlLocale === "string" && !storageLocale) {
-      localStorage.setItem(this.localeField, urlLocale);
-    }
-
-    this.locale = urlLocale || storageLocale || this.defaultLocale;
-  }
-
   /** 获取语言 */
   getLocale(basis = false): string {
     if (basis) {
       const params = window.location.href.split("?")[1];
-      const urlLocale = parse(params)?.[this.localeField];
+      const urlLocale = parse(params)?.[this.localeField] as string;
+
       const storageLocale = localStorage.getItem(this.localeField);
 
-      if (urlLocale && typeof urlLocale === "string" && !storageLocale) {
-        localStorage.setItem(this.localeField, urlLocale);
-      }
+      const navigatorLocale = navigator.language?.split("-")[0];
 
-      return urlLocale || storageLocale || this.defaultLocale;
+      const locale = urlLocale || storageLocale || navigatorLocale;
+      this.setLocale(locale);
+
+      return locale;
     } else {
       return this.locale;
     }

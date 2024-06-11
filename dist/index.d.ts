@@ -15,7 +15,6 @@ export default class I18<T> {
     DOMreplace(): void;
     /** 设置语言 */
     setLocale(locale: string): void;
-    initLocale(): void;
     /** 获取语言 */
     getLocale(basis?: boolean): string;
     /** 翻译 */
