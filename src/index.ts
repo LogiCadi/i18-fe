@@ -85,10 +85,7 @@ export default class I18<T> {
 
       const navigatorLocale = navigator.language?.split("-")[0];
 
-      const locale = urlLocale || storageLocale || navigatorLocale;
-      this.setLocale(locale);
-
-      return locale;
+      return urlLocale || storageLocale || navigatorLocale;
     } else {
       return this.locale;
     }
