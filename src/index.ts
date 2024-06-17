@@ -104,12 +104,6 @@ export default class I18<T> {
       });
     }
 
-    if (!result) {
-      console.warn(
-        `[warn][i18]未找到key为[${key as string}]的翻译文本，请检查`
-      );
-    }
-
-    return result;
+    return result || key;
   }
 }
