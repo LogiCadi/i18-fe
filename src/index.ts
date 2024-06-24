@@ -12,7 +12,7 @@ export type I18Props<T> = {
   debug?: boolean;
 };
 
-export default class I18<T> {
+export default class I18<T extends Record<string, Record<string, string>>> {
   [x: string]: any;
 
   constructor(props: I18Props<T> = {}) {
@@ -58,7 +58,7 @@ export default class I18<T> {
   }
 
   /** 设置语言 */
-  setLocale(locale: string) {
+  setLocale(locale: GetLocaleKeys<T>) {
     // set storage locale
     localStorage.setItem(this.localeField, locale);
 
@@ -92,7 +92,7 @@ export default class I18<T> {
   }
 
   /** 翻译 */
-  t(key: keyof T, params?: any) {
+  t(key: keyof T, params?: Record<string, any>): string {
     const locale = this.getLocale();
     let result =
       // @ts-ignore
@@ -106,4 +106,28 @@ export default class I18<T> {
 
     return result || key;
   }
+
+  translate = this.t;
+
+  unpack() {
+    const pack = {} as Record<GetLocaleKeys<T>, Record<keyof T, string>>;
+
+    Object.keys(this.pack).forEach((key) => {
+      Object.keys(this.pack[key]).forEach((locale) => {
+        if (!pack[locale as GetLocaleKeys<T>])
+          pack[locale as GetLocaleKeys<T>] = {} as Record<keyof T, string>;
+
+        pack[locale as GetLocaleKeys<T>][key as keyof T] =
+          this.pack[key][locale];
+      });
+    });
+
+    return pack;
+  }
 }
+
+export type GetLocaleKeys<T> = T extends Record<string, infer R>
+  ? R extends Record<infer L, string>
+    ? L
+    : never
+  : never;

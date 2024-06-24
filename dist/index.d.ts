@@ -9,14 +9,17 @@ export type I18Props<T> = {
     replace?: boolean;
     debug?: boolean;
 };
-export default class I18<T> {
+export default class I18<T extends Record<string, Record<string, string>>> {
     [x: string]: any;
     constructor(props?: I18Props<T>);
     DOMreplace(): void;
     /** 设置语言 */
-    setLocale(locale: string): void;
+    setLocale(locale: GetLocaleKeys<T>): void;
     /** 获取语言 */
     getLocale(basis?: boolean): string;
     /** 翻译 */
-    t(key: keyof T, params?: any): any;
+    t(key: keyof T, params?: Record<string, any>): string;
+    translate: (key: keyof T, params?: Record<string, any>) => string;
+    unpack(): Record<GetLocaleKeys<T>, Record<keyof T, string>>;
 }
+export type GetLocaleKeys<T> = T extends Record<string, infer R> ? R extends Record<infer L, string> ? L : never : never;
