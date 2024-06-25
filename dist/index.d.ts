@@ -1,3 +1,4 @@
+export type GetKeys<T> = T extends Record<string, infer R> ? R extends Record<infer L, string> ? L : never : never;
 export type I18Props<T> = {
     /** 语言包 */
     pack?: T;
@@ -14,12 +15,11 @@ export default class I18<T extends Record<string, Record<string, string>>> {
     constructor(props?: I18Props<T>);
     DOMreplace(): void;
     /** 设置语言 */
-    setLocale(locale: GetLocaleKeys<T>): void;
+    setLocale(locale: GetKeys<T>): void;
     /** 获取语言 */
     getLocale(basis?: boolean): string;
     /** 翻译 */
     t(key: keyof T, params?: Record<string, any>): string;
     translate: (key: keyof T, params?: Record<string, any>) => string;
-    unpack(): Record<GetLocaleKeys<T>, Record<keyof T, string>>;
+    static packFmt: <T_1 extends Record<string, Record<string, string>>>(pack: T_1) => Record<GetKeys<T_1>, Record<keyof T_1, string>>;
 }
-export type GetLocaleKeys<T> = T extends Record<string, infer R> ? R extends Record<infer L, string> ? L : never : never;

@@ -1,5 +1,11 @@
 import { stringify, parse } from "query-string";
 
+export type GetKeys<T> = T extends Record<string, infer R>
+  ? R extends Record<infer L, string>
+    ? L
+    : never
+  : never;
+
 export type I18Props<T> = {
   /** 语言包 */
   pack?: T;
@@ -29,10 +35,10 @@ export default class I18<T extends Record<string, Record<string, string>>> {
 
   DOMreplace() {
     const contentHandler = (content: string) => {
-      return (
-        this.t(content as keyof T) ||
-        content.replace(/{locale}/g, this.getLocale())
-      );
+      if (content.search(/{locale}/) !== -1) {
+        return content.replace(/{locale}/g, this.getLocale());
+      }
+      return this.t(content as keyof T);
     };
     // 常规元素的children
     const commonDOM = document.querySelectorAll("[i18-children]");
@@ -58,7 +64,7 @@ export default class I18<T extends Record<string, Record<string, string>>> {
   }
 
   /** 设置语言 */
-  setLocale(locale: GetLocaleKeys<T>) {
+  setLocale(locale: GetKeys<T>) {
     // set storage locale
     localStorage.setItem(this.localeField, locale);
 
@@ -104,30 +110,29 @@ export default class I18<T extends Record<string, Record<string, string>>> {
       });
     }
 
-    return result || key;
+    if (!result)
+      console.warn(
+        `[i18][WARN]请确认 key = ${key as string}, locale = ${locale} 是否正确`
+      );
+
+    return result;
   }
 
   translate = this.t;
 
-  unpack() {
-    const pack = {} as Record<GetLocaleKeys<T>, Record<keyof T, string>>;
+  static packFmt = <T extends Record<string, Record<string, string>>>(
+    pack: T
+  ) => {
+    const res = {} as Record<GetKeys<T>, Record<keyof T, string>>;
+    Object.keys(pack).forEach((locale) => {
+      Object.keys(pack[locale]).forEach((key) => {
+        if (!res[key as GetKeys<T>])
+          res[key as GetKeys<T>] = {} as Record<keyof T, string>;
 
-    Object.keys(this.pack).forEach((key) => {
-      Object.keys(this.pack[key]).forEach((locale) => {
-        if (!pack[locale as GetLocaleKeys<T>])
-          pack[locale as GetLocaleKeys<T>] = {} as Record<keyof T, string>;
-
-        pack[locale as GetLocaleKeys<T>][key as keyof T] =
-          this.pack[key][locale];
+        res[key as GetKeys<T>][locale as keyof T] = pack[locale][key];
       });
     });
 
-    return pack;
-  }
+    return res;
+  };
 }
-
-export type GetLocaleKeys<T> = T extends Record<string, infer R>
-  ? R extends Record<infer L, string>
-    ? L
-    : never
-  : never;
