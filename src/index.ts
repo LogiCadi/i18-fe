@@ -120,16 +120,16 @@ export default class I18<T extends Record<string, Record<string, string>>> {
 
   translate = this.t;
 
-  static packFmt = <T extends Record<string, Record<string, string>>>(
-    pack: T
+  static packFmt = <L extends Record<string, Record<string, string>>>(
+    pack: L
   ) => {
-    const res = {} as Record<GetKeys<T>, Record<keyof T, string>>;
+    const res = {} as Record<GetKeys<L>, Record<keyof L, string>>;
     Object.keys(pack).forEach((locale) => {
       Object.keys(pack[locale]).forEach((key) => {
-        if (!res[key as GetKeys<T>])
-          res[key as GetKeys<T>] = {} as Record<keyof T, string>;
+        if (!res[key as GetKeys<L>])
+          res[key as GetKeys<L>] = {} as Record<keyof L, string>;
 
-        res[key as GetKeys<T>][locale as keyof T] = pack[locale][key];
+        res[key as GetKeys<L>][locale as keyof L] = pack[locale][key];
       });
     });
 

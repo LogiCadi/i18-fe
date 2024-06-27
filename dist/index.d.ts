@@ -21,5 +21,5 @@ export default class I18<T extends Record<string, Record<string, string>>> {
     /** 翻译 */
     t(key: keyof T, params?: Record<string, any>): string;
     translate: (key: keyof T, params?: Record<string, any>) => string;
-    static packFmt: <T_1 extends Record<string, Record<string, string>>>(pack: T_1) => Record<GetKeys<T_1>, Record<keyof T_1, string>>;
+    static packFmt: <L extends Record<string, Record<string, string>>>(pack: L) => Record<GetKeys<L>, Record<keyof L, string>>;
 }
